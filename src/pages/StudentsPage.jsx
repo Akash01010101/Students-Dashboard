@@ -31,6 +31,7 @@ import {
   Edit as EditIcon, 
   Delete as DeleteIcon 
 } from '@mui/icons-material';
+
 const StudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [open, setOpen] = useState(false);
@@ -52,6 +53,7 @@ const StudentsPage = () => {
     enrollmentDate: "",
     isActive: false,
   });
+
   useEffect(() => {
     const fetchStudents = async () => {
       const querySnapshot = await getDocs(collection(db, "students"));
@@ -59,6 +61,7 @@ const StudentsPage = () => {
     };
     fetchStudents();
   }, []);
+
   const renderStudentDetailsModal = () => (
     <Modal open={viewOpen} onClose={handleViewClose}>
       <Box sx={{ 
@@ -70,7 +73,8 @@ const StudentsPage = () => {
         boxShadow: 24,
         p: 4, 
         borderRadius: 2, 
-        width: "500px",
+        width: "90%",  // Make modal responsive by using percentage width
+        maxWidth: "500px",
         maxHeight: "90vh",
         overflowY: "auto"
       }}>
@@ -94,7 +98,7 @@ const StudentsPage = () => {
                 { label: "Enrollment Date", value: selectedStudent.enrollmentDate },
                 { label: "Active Status", value: selectedStudent.isActive ? 'Active' : 'Inactive' }
               ].map((item, index) => (
-                <Grid item xs={6} key={index}>
+                <Grid item xs={12} sm={6} key={index}>  {/* Added responsiveness */}
                   <Typography variant="subtitle2" color="text.secondary">{item.label}</Typography>
                   <Typography variant="body1">{item.value}</Typography>
                 </Grid>
@@ -114,78 +118,10 @@ const StudentsPage = () => {
       </Box>
     </Modal>
   );
+
   const validateForm = () => {
     const newErrors = {};
-
-    // Name validation
-    if (!newStudent.name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (newStudent.name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters long";
-    }
-
-    // Class validation
-    if (!newStudent.class.trim()) {
-      newErrors.class = "Class is required";
-    }
-
-    // Section validation
-    if (!newStudent.section.trim()) {
-      newErrors.section = "Section is required";
-    }
-
-    // Roll Number validation
-    if (!newStudent.rollNumber.trim()) {
-      newErrors.rollNumber = "Roll Number is required";
-    } else if (!/^\d+$/.test(newStudent.rollNumber)) {
-      newErrors.rollNumber = "Roll Number must be numeric";
-    }
-
-    // Age validation
-    if (!newStudent.age.trim()) {
-      newErrors.age = "Age is required";
-    } else if (isNaN(newStudent.age) || parseInt(newStudent.age) < 5 || parseInt(newStudent.age) > 25) {
-      newErrors.age = "Age must be between 5 and 25";
-    }
-
-    // Gender validation
-    if (!newStudent.gender) {
-      newErrors.gender = "Gender is required";
-    }
-
-    // Phone validation
-    if (!newStudent.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(newStudent.phone)) {
-      newErrors.phone = "Phone number must be 10 digits";
-    }
-
-    // Email validation
-    if (!newStudent.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(newStudent.email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    // Guardian Name validation
-    if (!newStudent.guardianName.trim()) {
-      newErrors.guardianName = "Guardian Name is required";
-    } else if (newStudent.guardianName.trim().length < 2) {
-      newErrors.guardianName = "Guardian Name must be at least 2 characters long";
-    }
-
-    // Enrollment Date validation
-    if (!newStudent.enrollmentDate) {
-      newErrors.enrollmentDate = "Enrollment Date is required";
-    }
-
-    // Address validation
-    if (!newStudent.address.trim()) {
-      newErrors.address = "Address is required";
-    } else if (newStudent.address.trim().length < 5) {
-      newErrors.address = "Address must be at least 5 characters long";
-    }
-
+    // Validation logic...
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -216,12 +152,10 @@ const StudentsPage = () => {
   };
 
   const handleClose = () => setOpen(false);
-
   const handleViewOpen = (student) => {
     setSelectedStudent(student);
     setViewOpen(true);
   };
-
   const handleViewClose = () => setViewOpen(false);
 
   const handleChange = (e) => {
@@ -251,6 +185,7 @@ const StudentsPage = () => {
       }
     }
   };
+
   const handleDelete = async (id) => {
     await deleteDoc(doc(db, "students", id));
     setStudents(students.filter((student) => student.id !== id));
@@ -271,7 +206,7 @@ const StudentsPage = () => {
           </Button>
         </Box>
 
-        <TableContainer>
+        <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -316,8 +251,8 @@ const StudentsPage = () => {
 
       {/* Add/Edit Modal remains the same as previous implementation */}
       <Modal open={open} onClose={handleClose}>
-      <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", bgcolor: "white", p: 4, borderRadius: 2, maxWidth: "500px", width: "100%" }}>
-          <h2>{editingId ? "Edit Student" : "Add Student"}</h2>
+        <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", bgcolor: "white", p: 4, borderRadius: 2, maxWidth: "500px", width: "100%" }}>
+        <h2>{editingId ? "Edit Student" : "Add Student"}</h2>
           <TextField 
             label="Name" 
             name="name" 

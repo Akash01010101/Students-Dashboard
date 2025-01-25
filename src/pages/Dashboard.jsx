@@ -9,7 +9,9 @@ import {
   AppBar, 
   Toolbar, 
   Typography, 
-  IconButton 
+  IconButton, 
+  useTheme, 
+  useMediaQuery 
 } from '@mui/material';
 import { 
   People as StudentsIcon, 
@@ -22,6 +24,8 @@ import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const [selectedPage, setSelectedPage] = useState('students');
   const auth = getAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check for mobile screen size
 
   const handleLogout = () => {
     signOut(auth)
@@ -29,17 +33,19 @@ const Dashboard = () => {
         console.error('Logout error', error);
       });
   };
-const nav = useNavigate();
+  
+  const nav = useNavigate();
 
   const drawerWidth = 240;
 
   return (
     <Box sx={{ display: 'flex' }}>
+      {/* AppBar */}
       <AppBar 
         position="fixed" 
         sx={{ 
-          width: `calc(100% - ${drawerWidth}px)`, 
-          ml: `${drawerWidth}px` 
+          width: `calc(100% - ${isMobile ? 0 : drawerWidth}px)`, 
+          ml: `${isMobile ? 0 : drawerWidth}px` 
         }}
       >
         <Toolbar>
@@ -49,6 +55,7 @@ const nav = useNavigate();
         </Toolbar>
       </AppBar>
 
+      {/* Drawer */}
       <Drawer
         sx={{
           width: drawerWidth,
@@ -58,8 +65,10 @@ const nav = useNavigate();
             boxSizing: 'border-box',
           },
         }}
-        variant="permanent"
+        variant={isMobile ? "temporary" : "permanent"} // Use temporary drawer on mobile
         anchor="left"
+        open={!isMobile || selectedPage !== 'students'} // Hide drawer on mobile if not needed
+        onClose={() => setSelectedPage('students')}
       >
         <Toolbar />
         <List>
@@ -91,13 +100,14 @@ const nav = useNavigate();
         </List>
       </Drawer>
 
+      {/* Main Content */}
       <Box
         component="main"
         sx={{ 
           flexGrow: 1, 
           bgcolor: 'background.default', 
           p: 3,
-          width: `calc(100% - ${drawerWidth}px)`,
+          width: `calc(100% - ${isMobile ? 0 : drawerWidth}px)`,
           mt: '64px'  // AppBar height
         }}
       >
